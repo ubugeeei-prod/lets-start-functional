@@ -133,6 +133,8 @@ const customCss = `
   /* the default theme fades code blocks with a top gradient — keep them flat */
   .content pre {
     background: var(--octc-color-code-bg) !important;
+  }
+  .code-block {
     position: relative;
   }
   .code-copy {
@@ -151,7 +153,7 @@ const customCss = `
     opacity: 0;
     transition: opacity 0.15s ease, color 0.15s ease;
   }
-  .content pre:hover .code-copy,
+  .code-block:hover .code-copy,
   .code-copy:focus-visible { opacity: 1; }
   .code-copy:hover { color: #ededed; border-color: #555555; }
   .content blockquote {
@@ -202,7 +204,11 @@ const langSwitchJs = `
   (function () {
     function addCopyButtons() {
       document.querySelectorAll(".content pre").forEach(function (pre) {
-        if (pre.querySelector(".code-copy")) return;
+        if (pre.parentElement && pre.parentElement.classList.contains("code-block")) return;
+        var wrapper = document.createElement("div");
+        wrapper.className = "code-block";
+        pre.parentNode.insertBefore(wrapper, pre);
+        wrapper.appendChild(pre);
         var btn = document.createElement("button");
         btn.className = "code-copy";
         btn.type = "button";
@@ -215,7 +221,7 @@ const langSwitchJs = `
             setTimeout(function () { btn.textContent = "Copy"; }, 1500);
           });
         });
-        pre.appendChild(btn);
+        wrapper.appendChild(btn);
       });
     }
     if (document.readyState === "loading") {
