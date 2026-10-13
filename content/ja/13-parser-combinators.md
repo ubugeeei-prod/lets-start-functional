@@ -265,12 +265,19 @@ make test
 
 怖い名前たちの正体は，ひとつの具体的な型に対する能力のはしごでした:
 
-| インターフェース | `Parser`にとっての意味…                          | 買ってくれたもの…              |
-|-------------|--------------------------------------------------|--------------------------------|
-| Functor     | 結果を変換する                                   | `map toUpper (char 'a')`       |
-| Applicative | 残り入力を糸通ししながら順に走らせる             | `[\| ... \|]`，`*>`，`<*`      |
-| Monad       | 結果に「次に何をパースするか」を選ばせる         | `do`記法，`natural`           |
-| Alternative | 一方を試し，だめならもう一方(完全バックトラック) | `<\|>`，`many`，`some`         |
+<!-- An HTML table, not a Markdown one: the cells contain `|`, and
+     the site's Markdown renderer does not honor `\|` inside cells. -->
+<table>
+<thead>
+<tr><th>インターフェース</th><th><code>Parser</code>にとっての意味…</th><th>買ってくれたもの…</th></tr>
+</thead>
+<tbody>
+<tr><td>Functor</td><td>結果を変換する</td><td><code>map toUpper (char 'a')</code></td></tr>
+<tr><td>Applicative</td><td>残り入力を糸通ししながら順に走らせる</td><td><code>[| ... |]</code>，<code>*&gt;</code>，<code>&lt;*</code></td></tr>
+<tr><td>Monad</td><td>結果に「次に何をパースするか」を選ばせる</td><td><code>do</code>記法，<code>natural</code></td></tr>
+<tr><td>Alternative</td><td>一方を試し，だめならもう一方(完全バックトラック)</td><td><code>&lt;|&gt;</code>，<code>many</code>，<code>some</code></td></tr>
+</tbody>
+</table>
 
 どれもパーサ専用の機能ではありません．`List`や`Maybe`や`IO`が実装しているのと同じインターフェースです．だからこそ，インスタンスを書いた瞬間から`map`も`do`もイディオムブラケットもパーサの上で動いたのです．インターフェースを一度学べば，それを実装するすべての型には，すでに話せる語彙が最初から備わっているという感じです．この仕組み自体は，専用の章[インターフェースとふたつのモノイド](./16-interfaces.md)でじっくり掘り下げます．とりあえずここでは，チュートリアルがたいてい飛ばす「実際に使う」部分を先に済ませたことになります．
 

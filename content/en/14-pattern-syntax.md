@@ -142,7 +142,23 @@ isMeta c = elem c (unpack "()[]{}|*+?.\\")
 
 ### Escapes
 
-A backslash escape shows up in two roles. Inside a class, `\n` should give us a *character*; at the top level, `\d` should give us a whole *regex atom*. Two small parsers:
+A backslash escape shows up in two roles. Inside a class, `\n` should give us a *character*; at the top level, `\d` should give us a whole *regex atom*. Both start the same way: a backslash, then *whatever character comes next*. The bag of combinators from the [previous chapter](./13-parser-combinators.md) has no parser for "whatever character", so this commit adds one to `Regex/Parse.idr`:
+
+```idris
+||| Consume any single character.
+public export
+anyToken : Parser Char
+anyToken = MkParser $ \cs =>
+  case cs of
+    (c :: rest) => Just (c, rest)
+    []          => Nothing
+```
+
+It is the simplest parser there is: take the first character, whatever it is, and hand back the rest. The only way it can fail is when there is no character left to take. If the body looks familiar, that is because it is `satisfy` with the test deleted; `satisfy (const True)` would behave exactly the same. We spell it out anyway because "any character" deserves a name of its own, and with that name `char '\\' *> map interp anyToken` reads as what it does: a backslash, then any character, interpreted.
+
+That one failure case matters. A pattern ending in a lone backslash (`a\`, or `"a\\"` as an Idris string) leaves `anyToken` nothing to take, so the escape fails, and since `\` is a metacharacter no other atom will accept it either: `compile "a\\"` is `Nothing`. A dangling escape is rejected, not guessed at.
+
+With `anyToken` in hand, the two escape parsers are each a backslash followed by one character and a small table saying what that character means:
 
 ```idris
 ||| A backslash escape interpreted as a single character:
@@ -174,6 +190,8 @@ escapedAtom = char '\\' *> map interp anyToken
     interp 'r' = lit '\r'
     interp c   = lit c
 ```
+
+Notice who decides what counts as an escape. Not `anyToken`, which takes anything, but `interp`, whose last clause lets every other character stand for itself. That fallthrough is what turns `\.`, `\(` and `\\` into plain characters.
 
 Savor the `'D'` line. In [Character Classes](./11-character-classes.md) we made `complement` a single field flip, and here is the dividend: the negated shorthand `\D`, a feature in its own right in most regex engines, costs us exactly one call to `complement`. Good representations keep paying after you have forgotten choosing them.
 
@@ -295,7 +313,7 @@ Every fold here is earning its keep. `sequenceOf` folds `cat` over the atoms, th
 
 ### The knot, and why Idris made us tie it
 
-One line above deserves its own section: `group = char '(' *> recur alternation <* char ')'`. What is `recur`? It was added to `Regex/Parse.idr` in this very commit:
+One line above deserves its own section: `group = char '(' *> recur alternation <* char ')'`. What is `recur`? It is the other thing this commit added to `Regex/Parse.idr`, next to `anyToken`:
 
 ```idris
 ||| Tie the knot for recursive grammars.
