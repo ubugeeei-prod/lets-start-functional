@@ -265,12 +265,19 @@ This is commit [f42babe](https://github.com/ubugeeei-prod/lets-start-functional/
 
 The scary names turned out to be a ladder of capabilities for one concrete type:
 
-| Interface   | For `Parser`, it means…                          | It bought us…                  |
-|-------------|--------------------------------------------------|--------------------------------|
-| Functor     | transform the result                             | `map toUpper (char 'a')`       |
-| Applicative | run in sequence, threading leftover input        | `[\| ... \|]`, `*>`, `<*`      |
-| Monad       | let a result decide what to parse next           | `do`-notation, `natural`       |
-| Alternative | try one, fall back to the other (full backtrack) | `<\|>`, `many`, `some`         |
+<!-- An HTML table, not a Markdown one: the cells contain `|`, and
+     the site's Markdown renderer does not honor `\|` inside cells. -->
+<table>
+<thead>
+<tr><th>Interface</th><th>For <code>Parser</code>, it means…</th><th>It bought us…</th></tr>
+</thead>
+<tbody>
+<tr><td>Functor</td><td>transform the result</td><td><code>map toUpper (char 'a')</code></td></tr>
+<tr><td>Applicative</td><td>run in sequence, threading leftover input</td><td><code>[| ... |]</code>, <code>*&gt;</code>, <code>&lt;*</code></td></tr>
+<tr><td>Monad</td><td>let a result decide what to parse next</td><td><code>do</code>-notation, <code>natural</code></td></tr>
+<tr><td>Alternative</td><td>try one, fall back to the other (full backtrack)</td><td><code>&lt;|&gt;</code>, <code>many</code>, <code>some</code></td></tr>
+</tbody>
+</table>
 
 None of these are parser features. They are the *same* interfaces that `List`, `Maybe` and `IO` implement, which is why `map`, `do` and idiom brackets worked on parsers the moment we wrote the instances. Learn the interface once, and every type that implements it comes pre-equipped with vocabulary you already speak. A dedicated chapter, [Interfaces and Two Monoids](./16-interfaces.md), digs into this mechanism properly, but you have now *used* it, which is the part tutorials usually skip.
 
